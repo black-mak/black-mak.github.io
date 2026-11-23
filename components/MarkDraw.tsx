@@ -6,13 +6,12 @@ import { sound } from "@/lib/sound";
 import { MARK_D, MARK_VIEWBOX } from "./HeroMark";
 
 // ============================================================================
-// MarkDraw — Master Architectural Construction Proof
+// MarkDraw — Master Architectural Construction Proof & Interactive Dissection Lab
 // Slowly demonstrates the geometric stages of constructing the BLACK-MAK mark:
-// 1. Stage 1 (0.0s–1.0s): Blueprint grid, 45° bisectors & compass calibration
-// 2. Stage 2 (1.0s–4.5s): Slow vector contour drafting with traveling laser spark
-//    and pulsating coordinate nodes at key apex & facet vertices (~3.5s draw)
-// 3. Stage 3 (4.5s–5.5s): Solid ink flood transition into razor-sharp mark
-// 4. Stage 4 (5.5s+): Golden specular sheen sweep + 3D tilt + Replay capability
+// 1. Stage 1: Blueprint grid, 45° bisectors & compass calibration
+// 2. Stage 2: Slow vector contour drafting with traveling laser spark & coordinates
+// 3. Stage 3: Solid ink flood transition into razor-sharp mark
+// 4. Stage 4: Golden specular sheen sweep + 3D tilt + Dissection layer controls
 // ============================================================================
 
 type Stage = "blueprint" | "draw" | "fill" | "done";
@@ -34,6 +33,9 @@ export default function MarkDraw() {
   const [stage, setStage] = useState<Stage>("blueprint");
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
   const [glintActive, setGlintActive] = useState(false);
+  const [showBisectors, setShowBisectors] = useState(true);
+  const [showNodes, setShowNodes] = useState(true);
+  const [showCircles, setShowCircles] = useState(true);
   const timerRefs = useRef<NodeJS.Timeout[]>([]);
 
   const clearAllTimers = () => {
@@ -68,7 +70,6 @@ export default function MarkDraw() {
         const len = pathRef.current.getTotalLength();
         pathRef.current.style.strokeDasharray = `${len}`;
         pathRef.current.style.strokeDashoffset = `${len}`;
-        // Slow architectural drafting over 3.4 seconds
         pathRef.current.style.transition =
           "stroke-dashoffset 3.4s cubic-bezier(0.25, 0.1, 0.25, 1)";
         requestAnimationFrame(() => {
@@ -93,10 +94,19 @@ export default function MarkDraw() {
     timerRefs.current = [t1, t2, t3];
   }, []);
 
+  const jumpToStage = (s: Stage) => {
+    clearAllTimers();
+    sound.click("soft");
+    setStage(s);
+    if (s === "done") {
+      setGlintActive(true);
+      setTimeout(() => setGlintActive(false), 1200);
+    }
+  };
+
   useEffect(() => {
     runSequence();
 
-    // Periodic magical glint sweep every 8 seconds in done stage
     const interval = setInterval(() => {
       setStage((curr) => {
         if (curr === "done") {
@@ -105,7 +115,7 @@ export default function MarkDraw() {
         }
         return curr;
       });
-    }, 8000);
+    }, 9000);
 
     return () => {
       clearAllTimers();
@@ -119,8 +129,8 @@ export default function MarkDraw() {
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
     setRotate({
-      x: -(y / rect.height) * 10,
-      y: (x / rect.width) * 10,
+      x: -(y / rect.height) * 8,
+      y: (x / rect.width) * 8,
     });
   };
 
@@ -141,7 +151,7 @@ export default function MarkDraw() {
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative flex h-full w-full items-center justify-center select-none"
+      className="relative flex h-full w-full flex-col items-center justify-center select-none"
       style={{ perspective: 900 }}
     >
       {/* 3D Tilted Container */}
@@ -169,9 +179,7 @@ export default function MarkDraw() {
         <div className="pointer-events-none absolute top-1.5 left-2 flex items-center gap-1.5 font-mono text-[0.52rem] uppercase tracking-wider text-muted z-20">
           <span
             className={`inline-block h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
-              stage === "done"
-                ? "bg-seal"
-                : "bg-white animate-ping"
+              stage === "done" ? "bg-seal" : "bg-white animate-ping"
             }`}
           />
           <span className="text-ink/80 font-medium">
@@ -182,14 +190,14 @@ export default function MarkDraw() {
           </span>
         </div>
 
-        {/* Replay Construction Trigger (Bottom Right) */}
+        {/* Replay Construction Trigger (Top Right) */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             sound.click("soft");
             runSequence();
           }}
-          className="absolute bottom-1.5 right-2 z-20 flex items-center gap-1 font-mono text-[0.52rem] uppercase tracking-wider text-muted hover:text-ink transition-colors border border-line/50 hover:border-seal/60 px-2 py-0.5 rounded bg-surface/80 backdrop-blur-sm"
+          className="absolute top-1.5 right-2 z-20 flex items-center gap-1 font-mono text-[0.52rem] uppercase tracking-wider text-muted hover:text-ink transition-colors border border-line/50 hover:border-seal/60 px-2 py-0.5 rounded bg-surface/80 backdrop-blur-sm"
           title="Replay Construction Stages"
         >
           <span className="text-seal">↻</span>
@@ -205,7 +213,6 @@ export default function MarkDraw() {
             className="h-full w-full overflow-visible drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]"
           >
             <defs>
-              {/* Golden Specular Sheen Gradient */}
               <linearGradient id="markGlint" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#ffffff" />
                 <stop offset="35%" stopColor="#ffffff" />
@@ -214,7 +221,6 @@ export default function MarkDraw() {
                 <stop offset="100%" stopColor="#ffffff" />
               </linearGradient>
 
-              {/* Sweeping Sheen Mask */}
               <mask id="glintMask">
                 <rect width="100%" height="100%" fill="black" />
                 <motion.rect
@@ -222,114 +228,112 @@ export default function MarkDraw() {
                   height="260"
                   fill="white"
                   initial={{ x: -100, y: -50 }}
-                  animate={
-                    glintActive
-                      ? { x: 250, y: 150 }
-                      : { x: -100, y: -50 }
-                  }
+                  animate={glintActive ? { x: 250, y: 150 } : { x: -100, y: -50 }}
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                   style={{ transform: "rotate(35deg)" }}
                 />
               </mask>
             </defs>
 
-            {/* ========================================================= */}
-            {/* STAGE 1: Architectural Blueprint Construction Guides      */}
-            {/* ========================================================= */}
+            {/* STAGE 1: Architectural Blueprint Construction Guides */}
             <g
               className="transition-opacity duration-700 pointer-events-none"
-              style={{ opacity: stage === "done" ? 0.18 : 0.65 }}
+              style={{ opacity: stage === "done" ? 0.2 : 0.65 }}
             >
               {/* Center Axis & Bisectors */}
-              <line
-                x1="77.5"
-                y1="-10"
-                x2="77.5"
-                y2="175"
-                stroke="#c9a227"
-                strokeWidth="0.6"
-                strokeDasharray="3 3"
-                opacity="0.6"
-              />
-              <line
-                x1="-10"
-                y1="82.5"
-                x2="165"
-                y2="82.5"
-                stroke="#c9a227"
-                strokeWidth="0.6"
-                strokeDasharray="3 3"
-                opacity="0.6"
-              />
-
-              {/* 45° Diagonal Construction Rays */}
-              <line
-                x1="-5"
-                y1="-5"
-                x2="160"
-                y2="160"
-                stroke="#ffffff"
-                strokeWidth="0.5"
-                strokeDasharray="4 4"
-                opacity="0.3"
-              />
-              <line
-                x1="160"
-                y1="-5"
-                x2="-5"
-                y2="160"
-                stroke="#ffffff"
-                strokeWidth="0.5"
-                strokeDasharray="4 4"
-                opacity="0.3"
-              />
-              <line
-                x1="77.5"
-                y1="0"
-                x2="0"
-                y2="77.5"
-                stroke="#e8c76b"
-                strokeWidth="0.5"
-                opacity="0.35"
-              />
-              <line
-                x1="77.5"
-                y1="0"
-                x2="155"
-                y2="77.5"
-                stroke="#e8c76b"
-                strokeWidth="0.5"
-                opacity="0.35"
-              />
+              {showBisectors && (
+                <>
+                  <line
+                    x1="77.5"
+                    y1="-10"
+                    x2="77.5"
+                    y2="175"
+                    stroke="#c9a227"
+                    strokeWidth="0.6"
+                    strokeDasharray="3 3"
+                    opacity="0.6"
+                  />
+                  <line
+                    x1="-10"
+                    y1="82.5"
+                    x2="165"
+                    y2="82.5"
+                    stroke="#c9a227"
+                    strokeWidth="0.6"
+                    strokeDasharray="3 3"
+                    opacity="0.6"
+                  />
+                  <line
+                    x1="-5"
+                    y1="-5"
+                    x2="160"
+                    y2="160"
+                    stroke="#ffffff"
+                    strokeWidth="0.5"
+                    strokeDasharray="4 4"
+                    opacity="0.3"
+                  />
+                  <line
+                    x1="160"
+                    y1="-5"
+                    x2="-5"
+                    y2="160"
+                    stroke="#ffffff"
+                    strokeWidth="0.5"
+                    strokeDasharray="4 4"
+                    opacity="0.3"
+                  />
+                  <line
+                    x1="77.5"
+                    y1="0"
+                    x2="0"
+                    y2="77.5"
+                    stroke="#e8c76b"
+                    strokeWidth="0.5"
+                    opacity="0.35"
+                  />
+                  <line
+                    x1="77.5"
+                    y1="0"
+                    x2="155"
+                    y2="77.5"
+                    stroke="#e8c76b"
+                    strokeWidth="0.5"
+                    opacity="0.35"
+                  />
+                </>
+              )}
 
               {/* Center Compass Calibration Rings */}
-              <circle
-                cx="77.5"
-                cy="82.5"
-                r="65"
-                fill="none"
-                stroke="#ffffff"
-                strokeWidth="0.5"
-                strokeDasharray="2 4"
-                opacity="0.25"
-              />
-              <circle
-                cx="77.5"
-                cy="82.5"
-                r="45"
-                fill="none"
-                stroke="#c9a227"
-                strokeWidth="0.5"
-                strokeDasharray="1 3"
-                opacity="0.3"
-              />
+              {showCircles && (
+                <>
+                  <circle
+                    cx="77.5"
+                    cy="82.5"
+                    r="65"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="0.5"
+                    strokeDasharray="2 4"
+                    opacity="0.25"
+                  />
+                  <circle
+                    cx="77.5"
+                    cy="82.5"
+                    r="45"
+                    fill="none"
+                    stroke="#c9a227"
+                    strokeWidth="0.5"
+                    strokeDasharray="1 3"
+                    opacity="0.3"
+                  />
+                </>
+              )}
             </g>
 
-            {/* ========================================================= */}
-            {/* STAGE 2: Geometric Node Calibration Markers               */}
-            {/* ========================================================= */}
+            {/* STAGE 2: Geometric Node Calibration Markers */}
             <AnimatePresence>
-              {(stage === "draw" || stage === "blueprint") && (
+              {showNodes && (stage === "draw" || stage === "blueprint") && (
                 <g className="pointer-events-none">
                   {KEY_NODES.map((node, i) => (
                     <g key={i}>
@@ -355,9 +359,7 @@ export default function MarkDraw() {
               )}
             </AnimatePresence>
 
-            {/* ========================================================= */}
-            {/* BASE VECTOR MONOGRAM PATH: Drawn Slowly with Precision    */}
-            {/* ========================================================= */}
+            {/* BASE VECTOR MONOGRAM PATH */}
             <path
               ref={pathRef}
               fillRule="evenodd"
@@ -409,9 +411,7 @@ export default function MarkDraw() {
               )}
             </AnimatePresence>
 
-            {/* ========================================================= */}
-            {/* STAGE 4: Golden Specular Sheen Layer                      */}
-            {/* ========================================================= */}
+            {/* STAGE 4: Golden Specular Sheen Layer */}
             {stage === "done" && (
               <path
                 fillRule="evenodd"
@@ -424,12 +424,98 @@ export default function MarkDraw() {
             )}
           </svg>
 
-          {/* Ambient Subtle Golden Under-Glow on hover / done */}
+          {/* Ambient Golden Under-Glow on hover / done */}
           <div
             className={`pointer-events-none absolute inset-0 -z-10 rounded-full bg-seal/20 blur-2xl transition-opacity duration-700 ${
               glintActive ? "opacity-60" : "opacity-0"
             }`}
           />
+        </div>
+
+        {/* Interactive Geometric Dissection Controls (Bottom) */}
+        <div className="absolute bottom-2 inset-x-2 z-20 flex flex-wrap items-center justify-between gap-1.5 border-t border-line/40 bg-surface/85 px-2.5 py-1.5 backdrop-blur-md rounded-sm">
+          {/* Stage Jumps */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => jumpToStage("blueprint")}
+              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
+                stage === "blueprint"
+                  ? "bg-seal text-bg font-bold"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              Grid
+            </button>
+            <button
+              onClick={() => jumpToStage("draw")}
+              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
+                stage === "draw"
+                  ? "bg-seal text-bg font-bold"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              Draft
+            </button>
+            <button
+              onClick={() => jumpToStage("fill")}
+              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
+                stage === "fill"
+                  ? "bg-seal text-bg font-bold"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              Solid
+            </button>
+            <button
+              onClick={() => jumpToStage("done")}
+              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
+                stage === "done"
+                  ? "bg-seal text-bg font-bold"
+                  : "text-muted hover:text-ink"
+              }`}
+            >
+              Calibrated
+            </button>
+          </div>
+
+          {/* Layer Toggles */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                sound.click("soft");
+                setShowBisectors((v) => !v);
+              }}
+              className={`mono text-[0.52rem] uppercase tracking-wider transition-colors ${
+                showBisectors ? "text-seal font-medium" : "text-faint/60 line-through"
+              }`}
+            >
+              45° Cut
+            </button>
+            <span className="text-line-strong text-[0.5rem]">|</span>
+            <button
+              onClick={() => {
+                sound.click("soft");
+                setShowNodes((v) => !v);
+              }}
+              className={`mono text-[0.52rem] uppercase tracking-wider transition-colors ${
+                showNodes ? "text-seal font-medium" : "text-faint/60 line-through"
+              }`}
+            >
+              Nodes
+            </button>
+            <span className="text-line-strong text-[0.5rem]">|</span>
+            <button
+              onClick={() => {
+                sound.click("soft");
+                setShowCircles((v) => !v);
+              }}
+              className={`mono text-[0.52rem] uppercase tracking-wider transition-colors ${
+                showCircles ? "text-seal font-medium" : "text-faint/60 line-through"
+              }`}
+            >
+              Arcs
+            </button>
+          </div>
         </div>
       </div>
     </div>

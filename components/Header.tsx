@@ -11,7 +11,12 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  const [isMuted, setIsMuted] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMuted(sound.isMuted());
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -122,6 +127,46 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Quick Action Trigger */}
+          <button
+            type="button"
+            onClick={() => {
+              sound.click("pop");
+              window.dispatchEvent(new CustomEvent("open-command-palette"));
+            }}
+            aria-label="Open Command Palette"
+            className="hidden lg:flex items-center gap-2 border border-line-strong px-2.5 py-1.5 font-mono text-[0.66rem] text-muted hover:border-ink hover:text-ink transition-colors"
+          >
+            <span className="text-seal font-semibold">⌘K</span>
+            <span className="uppercase tracking-wider text-[0.6rem]">
+              {lang === "ar" ? "قائمة سريعة" : "Menu"}
+            </span>
+          </button>
+          {/* Sound Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              const nextMuted = sound.toggleMute();
+              setIsMuted(nextMuted);
+              if (!nextMuted) sound.click("crisp");
+            }}
+            title={isMuted ? "Unmute tactile audio" : "Mute tactile audio"}
+            aria-label={isMuted ? "Unmute tactile audio" : "Mute tactile audio"}
+            className="grid h-10 w-10 place-items-center border border-line-strong text-muted transition-colors hover:border-ink hover:text-ink"
+          >
+            {isMuted ? (
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                <line x1="23" y1="9" x2="17" y2="15" />
+                <line x1="17" y1="9" x2="23" y2="15" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+              </svg>
+            )}
+          </button>
           <ThemeToggle />
           <button
             type="button"
