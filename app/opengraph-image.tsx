@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { TCCC_BLACK_B64 } from "@/lib/og-font";
 
+export const dynamic = "force-static";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "BLACK-MAK — Logo & Visual Identity Design";

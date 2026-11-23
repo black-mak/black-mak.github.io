@@ -103,7 +103,7 @@ export default function Header() {
             </a>
           ))}
           <a
-            href="https://muhamed-cv.vercel.app/"
+            href="https://black-mak.github.io/cv/"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => sound.click("crisp")}
@@ -166,7 +166,7 @@ export default function Header() {
             </a>
           ))}
           <a
-            href="https://muhamed-cv.vercel.app/"
+            href="https://black-mak.github.io/cv/"
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => {

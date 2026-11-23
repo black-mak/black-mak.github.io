@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 import { CASES } from "@/lib/cases";
 
-const BASE = "https://black-mak.vercel.app";
+export const dynamic = "force-static";
+
+const BASE = "https://black-mak.github.io";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const home: MetadataRoute.Sitemap[number] = {
