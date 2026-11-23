@@ -7,12 +7,14 @@ import { useI18n } from "@/lib/i18n";
 import Reveal from "./Reveal";
 import ScaleTest from "./ScaleTest";
 import HeadlineReveal from "./HeadlineReveal";
+import CaseStudyDrawer from "./CaseStudyDrawer";
 import { sound } from "@/lib/sound";
 
 type Category = "all" | "identity" | "calligraphy" | "logos" | "outdoor";
 
 type WorkItem = {
   n: string;
+  slug: string;
   category: "identity" | "calligraphy" | "logos" | "outdoor";
   href: string;
   behance: string;
@@ -28,6 +30,7 @@ type WorkItem = {
 const ALL_PROJECTS: WorkItem[] = [
   {
     n: "01",
+    slug: "logos-vol-1",
     category: "logos",
     href: "/work/logos-vol-1",
     behance: "https://www.behance.net/gallery/60219345/LOGOS-VOL-1",
@@ -40,6 +43,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "02",
+    slug: "black-mak-identity",
     category: "identity",
     href: "/work/black-mak-identity",
     behance: "https://www.behance.net/gallery/70417691/BLACK-MAK-IDENTITY",
@@ -50,6 +54,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "03",
+    slug: "calligraphi-works",
     category: "calligraphy",
     href: "/work/calligraphi-works",
     behance: "https://www.behance.net/gallery/67494575/Calligraphy-Work",
@@ -60,6 +65,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "04",
+    slug: "one-point-one",
     category: "identity",
     href: "/work/one-point-one",
     behance: "https://www.behance.net/gallery/37676919/11-ONE-POINT-ONE-Visual-identity",
@@ -70,6 +76,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "05",
+    slug: "logos-vol-2",
     category: "logos",
     href: "/work/logos-vol-2",
     behance: "https://www.behance.net/gallery/181721153/LOGOS-VOLI",
@@ -80,6 +87,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "06",
+    slug: "security-eye",
     category: "identity",
     href: "/work/security-eye",
     behance: "https://www.behance.net/gallery/38153367/SECURITY-EYE-VISUAL-IDENTITY",
@@ -90,6 +98,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "07",
+    slug: "makeen",
     category: "calligraphy",
     href: "/work/makeen",
     behance: "https://www.behance.net/gallery/224445345/MAKEEN",
@@ -100,6 +109,7 @@ const ALL_PROJECTS: WorkItem[] = [
   },
   {
     n: "08",
+    slug: "outdoor-advertising",
     category: "outdoor",
     href: "/work/outdoor-advertising",
     behance: "https://www.behance.net/gallery/37676905/OUTDOOR-ADVERTISING-WORKS-BANNERS",
@@ -114,7 +124,17 @@ const ALL_PROJECTS: WorkItem[] = [
 const FEATURED = ALL_PROJECTS.slice(0, 3);
 const MORE = ALL_PROJECTS.slice(3);
 
-function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
+function Card({
+  w,
+  i,
+  eager,
+  onOpenCase,
+}: {
+  w: WorkItem;
+  i: number;
+  eager?: boolean;
+  onOpenCase: (slug: string) => void;
+}) {
   const { t } = useI18n();
   return (
     <motion.div
@@ -130,11 +150,14 @@ function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
         {/* Subtle bottom gradient to ensure buttons have optimal contrast */}
         <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black/85 via-black/25 to-transparent transition-opacity duration-500 opacity-90 sm:opacity-70 group-hover:opacity-95" />
 
-        {/* Clickable Image leading to Case Study */}
-        <a
-          href={w.href}
-          onClick={() => sound.click("pop")}
-          className="block w-full h-full cursor-pointer"
+        {/* Clickable Image opening Case Study Drawer */}
+        <button
+          type="button"
+          onClick={() => {
+            sound.click("pop");
+            onOpenCase(w.slug);
+          }}
+          className="block w-full h-full cursor-pointer text-start"
           aria-label={t(w.titleKey)}
         >
           <Image
@@ -147,7 +170,7 @@ function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
             sizes={w.feature ? "(max-width: 1024px) 100vw, 58vw" : "(max-width: 768px) 100vw, 45vw"}
             className="w-full object-cover transition duration-700 group-hover:scale-[1.045] aspect-[16/10]"
           />
-        </a>
+        </button>
 
         {/* High-Contrast Interactive Buttons Bar */}
         <div className="absolute bottom-3 inset-x-3 sm:bottom-4 sm:inset-x-4 z-[5] flex items-center justify-between gap-2.5">
@@ -170,26 +193,32 @@ function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
             </span>
           </a>
 
-          {/* View Case Study */}
-          <a
-            href={w.href}
-            onClick={() => sound.click("pop")}
+          {/* Interactive Case Study Drawer Trigger */}
+          <button
+            type="button"
+            onClick={() => {
+              sound.click("pop");
+              onOpenCase(w.slug);
+            }}
             className="group/case inline-flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 font-mono text-[0.6rem] sm:text-[0.66rem] uppercase tracking-wider font-semibold text-black bg-white hover:bg-[#f0f0eb] border border-white shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover:shadow-[0_0_24px_rgba(255,255,255,0.55)] hover:scale-105 active:scale-95 transition-all duration-300 rounded-sm"
-            title="View Case Study"
+            title="Inspect Case Study"
           >
             <span>{t("work.viewCaseStudy")}</span>
             <span className="font-bold transition-transform duration-300 group-hover/case:translate-x-0.5 group-hover/case:-translate-y-0.5 rtl:group-hover/case:-translate-x-0.5">
               ↗
             </span>
-          </a>
+          </button>
         </div>
       </div>
 
       {/* Project Meta Information */}
-      <a
-        href={w.href}
-        onClick={() => sound.click("pop")}
-        className="block group/link"
+      <button
+        type="button"
+        onClick={() => {
+          sound.click("pop");
+          onOpenCase(w.slug);
+        }}
+        className="block group/link w-full text-start"
       >
         <div className="flex items-start justify-between gap-4 border-b border-line py-5 transition-transform duration-300 group-hover:-translate-y-0.5">
           <div className="flex items-baseline gap-4">
@@ -208,7 +237,7 @@ function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
           </p>
         )}
         <span className="work-title-line mt-2 block" aria-hidden="true" />
-      </a>
+      </button>
     </motion.div>
   );
 }
@@ -216,6 +245,7 @@ function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
 export default function Work() {
   const { t, lang } = useI18n();
   const [activeCategory, setActiveCategory] = useState<Category>("all");
+  const [activeCaseSlug, setActiveCaseSlug] = useState<string | null>(null);
 
   const categories: { id: Category; labelEn: string; labelAr: string; count: number }[] = [
     { id: "all", labelEn: "All Work", labelAr: "كل الأعمال", count: ALL_PROJECTS.length },
@@ -298,7 +328,13 @@ export default function Work() {
           <>
             <div className="grid grid-cols-1 gap-x-[clamp(1.5rem,3vw,3rem)] gap-y-[clamp(2.5rem,6vw,6rem)] lg:grid-cols-[1.45fr_1fr]">
               {FEATURED.map((w, i) => (
-                <Card key={w.n} w={w} i={i} eager={i < 1} />
+                <Card
+                  key={w.n}
+                  w={w}
+                  i={i}
+                  eager={i < 1}
+                  onOpenCase={(slug) => setActiveCaseSlug(slug)}
+                />
               ))}
             </div>
 
@@ -314,7 +350,12 @@ export default function Work() {
 
             <div className="grid grid-cols-1 gap-x-[clamp(1.5rem,3vw,3rem)] gap-y-[clamp(2.5rem,6vw,6rem)] md:grid-cols-2">
               {MORE.map((w, i) => (
-                <Card key={w.n} w={w} i={i} />
+                <Card
+                  key={w.n}
+                  w={w}
+                  i={i}
+                  onOpenCase={(slug) => setActiveCaseSlug(slug)}
+                />
               ))}
             </div>
           </>
@@ -322,7 +363,12 @@ export default function Work() {
           <div className="grid grid-cols-1 gap-x-[clamp(1.5rem,3vw,3rem)] gap-y-[clamp(2.5rem,6vw,6rem)] md:grid-cols-2">
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((w, i) => (
-                <Card key={w.n} w={{ ...w, cls: "" }} i={i} />
+                <Card
+                  key={w.n}
+                  w={{ ...w, cls: "" }}
+                  i={i}
+                  onOpenCase={(slug) => setActiveCaseSlug(slug)}
+                />
               ))}
             </AnimatePresence>
           </div>
@@ -344,6 +390,13 @@ export default function Work() {
           </div>
         </Reveal>
       </div>
+
+      {/* Cinematic Full-Screen Case Study Drawer */}
+      <CaseStudyDrawer
+        slug={activeCaseSlug}
+        onClose={() => setActiveCaseSlug(null)}
+        onSelectSlug={(slug) => setActiveCaseSlug(slug)}
+      />
     </section>
   );
 }

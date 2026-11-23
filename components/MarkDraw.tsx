@@ -6,15 +6,14 @@ import { sound } from "@/lib/sound";
 import { MARK_D, MARK_VIEWBOX } from "./HeroMark";
 
 // ============================================================================
-// MarkDraw — Master Architectural Construction Proof & Interactive Dissection Lab
-// Slowly demonstrates the geometric stages of constructing the BLACK-MAK mark:
-// 1. Stage 1: Blueprint grid, 45° bisectors & compass calibration
-// 2. Stage 2: Slow vector contour drafting with traveling laser spark & coordinates
-// 3. Stage 3: Solid ink flood transition into razor-sharp mark
-// 4. Stage 4: Golden specular sheen sweep + 3D tilt + Dissection layer controls
+// MarkDraw — Master Architectural Construction Proof & Physical Material Lab
+// 1. Geometric Stages: Blueprint Grid -> Vector Drafting -> Solid Ink -> Calibrated
+// 2. Physical Materials: Solid Ink -> Gold Foil Leaf -> Embossed Paper -> Bronze Facade
+// 3. Dynamic Dissection: 45° Angle Bisectors, Vertex Nodes, Compass Radii
 // ============================================================================
 
 type Stage = "blueprint" | "draw" | "fill" | "done";
+type Material = "solid" | "gold" | "paper" | "bronze";
 
 const KEY_NODES = [
   { x: 77.5, y: 0, label: "APEX 00°" },
@@ -31,6 +30,7 @@ export default function MarkDraw() {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const [stage, setStage] = useState<Stage>("blueprint");
+  const [material, setMaterial] = useState<Material>("gold");
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
   const [glintActive, setGlintActive] = useState(false);
   const [showBisectors, setShowBisectors] = useState(true);
@@ -71,25 +71,25 @@ export default function MarkDraw() {
         pathRef.current.style.strokeDasharray = `${len}`;
         pathRef.current.style.strokeDashoffset = `${len}`;
         pathRef.current.style.transition =
-          "stroke-dashoffset 3.4s cubic-bezier(0.25, 0.1, 0.25, 1)";
+          "stroke-dashoffset 3.2s cubic-bezier(0.25, 0.1, 0.25, 1)";
         requestAnimationFrame(() => {
           if (pathRef.current) {
             pathRef.current.style.strokeDashoffset = "0";
           }
         });
       }
-    }, 1000);
+    }, 900);
 
-    // Stage 2 -> Stage 3 (Ink flood): 4.5s
+    // Stage 2 -> Stage 3 (Ink flood): 4.1s
     const t2 = setTimeout(() => {
       setStage("fill");
-    }, 4500);
+    }, 4100);
 
-    // Stage 3 -> Stage 4 (Done + Glint): 5.5s
+    // Stage 3 -> Stage 4 (Done + Glint): 5.1s
     const t3 = setTimeout(() => {
       setStage("done");
       setGlintActive(true);
-    }, 5500);
+    }, 5100);
 
     timerRefs.current = [t1, t2, t3];
   }, []);
@@ -102,6 +102,14 @@ export default function MarkDraw() {
       setGlintActive(true);
       setTimeout(() => setGlintActive(false), 1200);
     }
+  };
+
+  const switchMaterial = (m: Material) => {
+    sound.click("crisp");
+    setMaterial(m);
+    setStage("done");
+    setGlintActive(true);
+    setTimeout(() => setGlintActive(false), 1200);
   };
 
   useEffect(() => {
@@ -151,7 +159,9 @@ export default function MarkDraw() {
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="relative flex h-full w-full flex-col items-center justify-center select-none"
+      className={`relative flex h-full w-full flex-col items-center justify-center select-none transition-colors duration-500 rounded-sm ${
+        material === "paper" ? "bg-[#ece9e2]/95" : "bg-transparent"
+      }`}
       style={{ perspective: 900 }}
     >
       {/* 3D Tilted Container */}
@@ -186,7 +196,7 @@ export default function MarkDraw() {
             {stage === "blueprint" && "STAGE 01 · BLUEPRINT GRID"}
             {stage === "draw" && "STAGE 02 · VECTOR DRAFT"}
             {stage === "fill" && "STAGE 03 · INK SOLIDIFICATION"}
-            {stage === "done" && "CALIBRATED · 45° IDENTITY"}
+            {stage === "done" && `CALIBRATED · ${material.toUpperCase()}`}
           </span>
         </div>
 
@@ -213,22 +223,38 @@ export default function MarkDraw() {
             className="h-full w-full overflow-visible drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)]"
           >
             <defs>
-              <linearGradient id="markGlint" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="35%" stopColor="#ffffff" />
-                <stop offset="50%" stopColor="#e8c76b" />
-                <stop offset="65%" stopColor="#c9a227" />
-                <stop offset="100%" stopColor="#ffffff" />
+              {/* Gold Leaf Foil Specular Gradient */}
+              <linearGradient id="goldMaterial" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#fff2be" />
+                <stop offset="25%" stopColor="#f3d078" />
+                <stop offset="50%" stopColor="#c9a227" />
+                <stop offset="75%" stopColor="#9e7b16" />
+                <stop offset="100%" stopColor="#ffd885" />
               </linearGradient>
 
+              {/* Architectural Bronze Gradient */}
+              <linearGradient id="bronzeMaterial" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#bfa58a" />
+                <stop offset="40%" stopColor="#7a5c3e" />
+                <stop offset="70%" stopColor="#4a3522" />
+                <stop offset="100%" stopColor="#967554" />
+              </linearGradient>
+
+              {/* Debossed Letterpress Filter for Paper Material */}
+              <filter id="debossFilter" x="-10%" y="-10%" width="120%" height="120%">
+                <feDropShadow dx="0" dy="1.5" stdDeviation="1" floodColor="#000000" floodOpacity="0.4" />
+                <feDropShadow dx="0" dy="-1" stdDeviation="0.8" floodColor="#ffffff" floodOpacity="0.8" />
+              </filter>
+
+              {/* Sweeping Glint Mask */}
               <mask id="glintMask">
                 <rect width="100%" height="100%" fill="black" />
                 <motion.rect
-                  width="50"
+                  width="60"
                   height="260"
                   fill="white"
-                  initial={{ x: -100, y: -50 }}
-                  animate={glintActive ? { x: 250, y: 150 } : { x: -100, y: -50 }}
+                  initial={{ x: -120, y: -50 }}
+                  animate={glintActive ? { x: 260, y: 150 } : { x: -120, y: -50 }}
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                   style={{ transform: "rotate(35deg)" }}
                 />
@@ -238,7 +264,14 @@ export default function MarkDraw() {
             {/* STAGE 1: Architectural Blueprint Construction Guides */}
             <g
               className="transition-opacity duration-700 pointer-events-none"
-              style={{ opacity: stage === "done" ? 0.2 : 0.65 }}
+              style={{
+                opacity:
+                  stage === "done"
+                    ? material === "paper"
+                      ? 0.12
+                      : 0.22
+                    : 0.65,
+              }}
             >
               {/* Center Axis & Bisectors */}
               {showBisectors && (
@@ -312,7 +345,7 @@ export default function MarkDraw() {
                     cy="82.5"
                     r="65"
                     fill="none"
-                    stroke="#ffffff"
+                    stroke={material === "paper" ? "#222" : "#ffffff"}
                     strokeWidth="0.5"
                     strokeDasharray="2 4"
                     opacity="0.25"
@@ -359,18 +392,29 @@ export default function MarkDraw() {
               )}
             </AnimatePresence>
 
-            {/* BASE VECTOR MONOGRAM PATH */}
+            {/* BASE VECTOR MONOGRAM PATH with Physical Material Binding */}
             <path
               ref={pathRef}
               fillRule="evenodd"
               clipRule="evenodd"
               d={MARK_D}
-              fill={stage === "done" ? "currentColor" : "#ffffff"}
+              fill={
+                stage !== "done"
+                  ? "#ffffff"
+                  : material === "gold"
+                  ? "url(#goldMaterial)"
+                  : material === "bronze"
+                  ? "url(#bronzeMaterial)"
+                  : material === "paper"
+                  ? "#18181b"
+                  : "currentColor"
+              }
+              filter={stage === "done" && material === "paper" ? "url(#debossFilter)" : undefined}
               stroke={stage === "done" ? "none" : "#e8c76b"}
               strokeWidth={stage === "done" ? 0 : 1.3}
               strokeLinejoin="miter"
               strokeMiterlimit={10}
-              className="text-ink transition-colors duration-500"
+              className="text-ink transition-all duration-500"
               style={{
                 fillOpacity:
                   stage === "blueprint" || stage === "draw"
@@ -411,110 +455,160 @@ export default function MarkDraw() {
               )}
             </AnimatePresence>
 
-            {/* STAGE 4: Golden Specular Sheen Layer */}
+            {/* Specular Glint Reflection on Material */}
             {stage === "done" && (
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
                 d={MARK_D}
-                fill="url(#markGlint)"
+                fill={material === "paper" ? "#ffffff" : "url(#goldMaterial)"}
                 mask="url(#glintMask)"
-                className="pointer-events-none opacity-90"
+                className="pointer-events-none opacity-80"
               />
             )}
           </svg>
 
           {/* Ambient Golden Under-Glow on hover / done */}
           <div
-            className={`pointer-events-none absolute inset-0 -z-10 rounded-full bg-seal/20 blur-2xl transition-opacity duration-700 ${
-              glintActive ? "opacity-60" : "opacity-0"
-            }`}
+            className={`pointer-events-none absolute inset-0 -z-10 rounded-full blur-2xl transition-opacity duration-700 ${
+              material === "gold"
+                ? "bg-seal/30"
+                : material === "bronze"
+                ? "bg-[#7a5c3e]/30"
+                : "bg-seal/10"
+            } ${glintActive ? "opacity-70" : "opacity-0"}`}
           />
         </div>
 
-        {/* Interactive Geometric Dissection Controls (Bottom) */}
-        <div className="absolute bottom-2 inset-x-2 z-20 flex flex-wrap items-center justify-between gap-1.5 border-t border-line/40 bg-surface/85 px-2.5 py-1.5 backdrop-blur-md rounded-sm">
-          {/* Stage Jumps */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => jumpToStage("blueprint")}
-              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
-                stage === "blueprint"
-                  ? "bg-seal text-bg font-bold"
-                  : "text-muted hover:text-ink"
-              }`}
-            >
-              Grid
-            </button>
-            <button
-              onClick={() => jumpToStage("draw")}
-              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
-                stage === "draw"
-                  ? "bg-seal text-bg font-bold"
-                  : "text-muted hover:text-ink"
-              }`}
-            >
-              Draft
-            </button>
-            <button
-              onClick={() => jumpToStage("fill")}
-              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
-                stage === "fill"
-                  ? "bg-seal text-bg font-bold"
-                  : "text-muted hover:text-ink"
-              }`}
-            >
-              Solid
-            </button>
-            <button
-              onClick={() => jumpToStage("done")}
-              className={`mono text-[0.55rem] px-1.5 py-0.5 rounded transition-colors ${
-                stage === "done"
-                  ? "bg-seal text-bg font-bold"
-                  : "text-muted hover:text-ink"
-              }`}
-            >
-              Calibrated
-            </button>
+        {/* Master Control Deck: Stage Jumps, Material Switcher, and Layer Toggles */}
+        <div className="absolute bottom-2 inset-x-2 z-20 flex flex-col gap-1.5 border-t border-line/40 bg-surface/90 px-2.5 py-1.5 backdrop-blur-md rounded-sm">
+          {/* Top Row: Physical Material Selector */}
+          <div className="flex items-center justify-between border-b border-line/30 pb-1">
+            <span className="mono text-[0.52rem] uppercase tracking-widest text-faint">
+              MATERIAL
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => switchMaterial("solid")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-all ${
+                  material === "solid"
+                    ? "bg-ink text-bg font-bold shadow-sm"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Ink
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMaterial("gold")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-all ${
+                  material === "gold"
+                    ? "bg-seal text-bg font-bold shadow-sm"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Gold Foil
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMaterial("paper")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-all ${
+                  material === "paper"
+                    ? "bg-[#27272a] text-[#f4f4f5] font-bold shadow-sm"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Letterpress
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMaterial("bronze")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-all ${
+                  material === "bronze"
+                    ? "bg-[#7a5c3e] text-white font-bold shadow-sm"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Bronze
+              </button>
+            </div>
           </div>
 
-          {/* Layer Toggles */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                sound.click("soft");
-                setShowBisectors((v) => !v);
-              }}
-              className={`mono text-[0.52rem] uppercase tracking-wider transition-colors ${
-                showBisectors ? "text-seal font-medium" : "text-faint/60 line-through"
-              }`}
-            >
-              45° Cut
-            </button>
-            <span className="text-line-strong text-[0.5rem]">|</span>
-            <button
-              onClick={() => {
-                sound.click("soft");
-                setShowNodes((v) => !v);
-              }}
-              className={`mono text-[0.52rem] uppercase tracking-wider transition-colors ${
-                showNodes ? "text-seal font-medium" : "text-faint/60 line-through"
-              }`}
-            >
-              Nodes
-            </button>
-            <span className="text-line-strong text-[0.5rem]">|</span>
-            <button
-              onClick={() => {
-                sound.click("soft");
-                setShowCircles((v) => !v);
-              }}
-              className={`mono text-[0.52rem] uppercase tracking-wider transition-colors ${
-                showCircles ? "text-seal font-medium" : "text-faint/60 line-through"
-              }`}
-            >
-              Arcs
-            </button>
+          {/* Bottom Row: Stage Jumps & Layer Toggles */}
+          <div className="flex flex-wrap items-center justify-between gap-1">
+            {/* Stage Selector */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => jumpToStage("blueprint")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-colors ${
+                  stage === "blueprint"
+                    ? "bg-seal text-bg font-bold"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Grid
+              </button>
+              <button
+                onClick={() => jumpToStage("draw")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-colors ${
+                  stage === "draw"
+                    ? "bg-seal text-bg font-bold"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Draft
+              </button>
+              <button
+                onClick={() => jumpToStage("fill")}
+                className={`mono text-[0.52rem] px-1.5 py-0.5 rounded transition-colors ${
+                  stage === "fill"
+                    ? "bg-seal text-bg font-bold"
+                    : "text-muted hover:text-ink"
+                }`}
+              >
+                Solid
+              </button>
+            </div>
+
+            {/* Layer Toggles */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => {
+                  sound.click("soft");
+                  setShowBisectors((v) => !v);
+                }}
+                className={`mono text-[0.5rem] uppercase tracking-wider transition-colors ${
+                  showBisectors ? "text-seal font-medium" : "text-faint/60 line-through"
+                }`}
+              >
+                45°
+              </button>
+              <span className="text-line-strong text-[0.5rem]">|</span>
+              <button
+                onClick={() => {
+                  sound.click("soft");
+                  setShowNodes((v) => !v);
+                }}
+                className={`mono text-[0.5rem] uppercase tracking-wider transition-colors ${
+                  showNodes ? "text-seal font-medium" : "text-faint/60 line-through"
+                }`}
+              >
+                Nodes
+              </button>
+              <span className="text-line-strong text-[0.5rem]">|</span>
+              <button
+                onClick={() => {
+                  sound.click("soft");
+                  setShowCircles((v) => !v);
+                }}
+                className={`mono text-[0.5rem] uppercase tracking-wider transition-colors ${
+                  showCircles ? "text-seal font-medium" : "text-faint/60 line-through"
+                }`}
+              >
+                Arcs
+              </button>
+            </div>
           </div>
         </div>
       </div>
