@@ -43,12 +43,12 @@ export default function Hero() {
               <p className="lede mt-[clamp(1.8rem,3vw,2.6rem)]">{t("hero.lede")}</p>
             </Reveal>
             <Reveal delay={0.34}>
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-5">
                 <a
                   href="#start-a-project"
                   data-magnetic
                   onClick={() => sound.click("crisp")}
-                  className="btn btn-light"
+                  className="btn btn-light shrink-0"
                 >
                   <span>{t("hero.cta")}</span>
                   <span aria-hidden="true">↗</span>
@@ -57,7 +57,7 @@ export default function Hero() {
                   href="#work"
                   data-magnetic
                   onClick={() => sound.click("soft")}
-                  className="btn btn-ghost"
+                  className="btn btn-ghost shrink-0"
                 >
                   <span>{t("hero.work")}</span>
                   <span aria-hidden="true">↓</span>
