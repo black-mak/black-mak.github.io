@@ -37,6 +37,15 @@ export default function Intro() {
       return;
     }
 
+    // Skip if already seen in this session
+    try {
+      if (sessionStorage.getItem("bm_intro_seen")) {
+        setShow(false);
+        setGone(true);
+        return;
+      }
+    } catch {}
+
     // Respect reduced-motion preferences
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setShow(false);
@@ -44,19 +53,37 @@ export default function Intro() {
       return;
     }
 
-    const t = [
-      setTimeout(() => setStage(1), 150),    // Grid lines & circle calibration initiate
-      setTimeout(() => setStage(2), 450),    // Pure white monogram draws
-      setTimeout(() => setStage(3), 1700),   // Ink flood + Soullife signature writes on
-      setTimeout(() => setStage(4), 4000),   // Full resolution lockup inside circle
-      setTimeout(() => setShow(false), 4800),// Curtain fade-out (+1.0s extended duration)
-      setTimeout(() => setGone(true), 5300), // Unmount from DOM
-    ];
+    const isMobile = window.innerWidth < 768;
+    // On mobile, keep it fast (2.4s) so visitors immediately access the content
+    const t = isMobile
+      ? [
+          setTimeout(() => setStage(1), 100),
+          setTimeout(() => setStage(2), 300),
+          setTimeout(() => setStage(3), 900),
+          setTimeout(() => setStage(4), 1800),
+          setTimeout(() => {
+            setShow(false);
+            try { sessionStorage.setItem("bm_intro_seen", "1"); } catch {}
+          }, 2400),
+          setTimeout(() => setGone(true), 2900),
+        ]
+      : [
+          setTimeout(() => setStage(1), 150),
+          setTimeout(() => setStage(2), 450),
+          setTimeout(() => setStage(3), 1700),
+          setTimeout(() => setStage(4), 3800),
+          setTimeout(() => {
+            setShow(false);
+            try { sessionStorage.setItem("bm_intro_seen", "1"); } catch {}
+          }, 4500),
+          setTimeout(() => setGone(true), 5000),
+        ];
 
     return () => t.forEach(clearTimeout);
   }, [pathname]);
 
   const handleSkip = () => {
+    try { sessionStorage.setItem("bm_intro_seen", "1"); } catch {}
     setShow(false);
     setTimeout(() => setGone(true), 300);
   };

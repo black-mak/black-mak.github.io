@@ -124,6 +124,7 @@ function Card({ w, i, eager }: { w: WorkItem; i: number; eager?: boolean }) {
               width={1280}
               height={800}
               priority={eager}
+              referrerPolicy="no-referrer"
               sizes={w.feature ? "(max-width: 1024px) 100vw, 58vw" : "(max-width: 768px) 100vw, 45vw"}
               className={`w-full object-cover transition duration-700 group-hover:scale-[1.045] ${
                 w.feature ? "aspect-[16/10]" : "aspect-[16/10]"

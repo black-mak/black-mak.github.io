@@ -107,6 +107,7 @@ export default function CaseView({ slug }: { slug: string }) {
                 width={1600}
                 height={1000}
                 priority
+                referrerPolicy="no-referrer"
                 sizes="(max-width: 1380px) 92vw, 1380px"
                 className="h-full w-full object-cover"
               />
@@ -150,6 +151,7 @@ export default function CaseView({ slug }: { slug: string }) {
                     width={1400}
                     height={950}
                     loading="lazy"
+                    referrerPolicy="no-referrer"
                     sizes="(max-width: 768px) 100vw, 50vw"
                     className="w-full h-auto object-contain transition duration-700 group-hover:scale-[1.02]"
                   />
@@ -243,6 +245,7 @@ export default function CaseView({ slug }: { slug: string }) {
               width={2400}
               height={1600}
               priority
+              referrerPolicy="no-referrer"
               sizes="95vw"
               className="max-h-[90vh] w-auto max-w-full object-contain border border-line"
             />
